@@ -31,5 +31,5 @@ BeanIntrospection<LocalPlus> local = BeanIntrospection.getIntrospection(LocalPlu
 assert local.getIndexedProperties(Constraint.class).size() == 3 // true
 
 BeanIntrospection<ExternalPlus> external = BeanIntrospection.getIntrospection(ExternalPlus)
-assert local.getIndexedProperties(Constraint.class).size() == 3 // FALSE: actual Constraints found = 1 (for 'tenant')
+assert external.getIndexedProperties(Constraint.class).size() == 3 // FALSE: actual Constraints found = 1 (for 'tenant')
 ```
