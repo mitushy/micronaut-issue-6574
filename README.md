@@ -1,16 +1,35 @@
-## Micronaut 3.2.0 Documentation
+## Micronaut issue/6574 sample app
 
-- [User Guide](https://docs.micronaut.io/3.2.0/guide/index.html)
-- [API Reference](https://docs.micronaut.io/3.2.0/api/index.html)
-- [Configuration Reference](https://docs.micronaut.io/3.2.0/guide/configurationreference.html)
-- [Micronaut Guides](https://guides.micronaut.io/index.html)
----
+https://github.com/micronaut-projects/micronaut-core/issues/6574
 
-## Feature security documentation
+Repo contains an expanded version of the below
+```groovy
+// Basically a local copy of 
+// https://github.com/micronaut-projects/micronaut-security/blob/master/security/src/main/java/io/micronaut/security/authentication/UsernamePasswordCredentials.java
+// for the sake of testing the diff between inheriting from local/external @Introspected classes
+@Introspected
+class Local {
+    @NotBlank @NotNull String username
+    @NotBlank @NotNull String password
+}
 
-- [Micronaut Security documentation](https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html)
+@Introspected
+class LocalPlus extends Local {
+    @NotBlank @NotNull String tenant
+    // username, password inherited from local class
+}
 
-## Feature http-client documentation
 
-- [Micronaut HTTP Client documentation](https://docs.micronaut.io/latest/guide/index.html#httpClient)
+@Introspected
+class ExternalPlus extends io.micronaut.security.authentication.UsernamePasswordCredentials {
+    @NotBlank @NotNull String tenant
+    // username, password inherited from external class
+}
 
+
+BeanIntrospection<LocalPlus> local = BeanIntrospection.getIntrospection(LocalPlus)
+assert local.getIndexedProperties(Constraint.class).size() == 3 // true
+
+BeanIntrospection<ExternalPlus> external = BeanIntrospection.getIntrospection(ExternalPlus)
+assert local.getIndexedProperties(Constraint.class).size() == 3 // FALSE: actual Constraints found = 1 (for 'tenant')
+```
